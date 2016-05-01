@@ -1,14 +1,27 @@
 
-module.exports = {
-    start: function() {
-        var express = require("express");
+module.exports = function(serverOptions) {
 
-        var app = express();
+    require("./src/common-utils");
 
-        app.use(express.static('.'));
+    serverOptions.baseDir = serverOptions.baseDir || ".";
+    serverOptions.port = serverOptions.port || 8080;
+
+    return {
+        start: function() {
+            var express = require("express");
+
+            var app = express();
 
 
-        var server = app.listen(8080, function () {
-        });
-    }
+
+            app.get("/", require("./src/cs-html/layout")({
+                bundle: require("./src/cs-html/bundle")()
+            }));
+            app.use(express.static(serverOptions.baseDir));
+
+
+            var server = app.listen(serverOptions.port, function () {
+            });
+        }
+    };
 };
