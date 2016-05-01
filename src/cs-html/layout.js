@@ -15,7 +15,9 @@ function removeComments(content) {
 }
 function simpleReplaces(content, vars) {
     Cols.eachEntry(vars, function(key, val) {
-        content = content.replace(key, val);
+        if (val) {
+            content = content.replace(key, val);
+        }
     });
     return content;
 }
@@ -45,6 +47,10 @@ module.exports = function(options) {
             content = content.replace("@RenderBody()", "");
             content = replaceBundles(content, bundles);
             content = simpleReplaces(content, options.replaces);
+
+            if (options.modifier) {
+                content = options.modifier(content);
+            }
 
             defer.resolve(content);
 

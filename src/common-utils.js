@@ -1107,6 +1107,20 @@ Async.createLazyExec = function(delay) {
         timeout = setTimeout(task, delay);
     }
 };
+Async.rapidCallAbsorber = function(targetFunc, duration) {
+    duration = duration || 100;
+
+    var timeout;
+    return function(task) {
+        if (timeout) {
+            return;
+        }
+        timeout = setTimeout(function() {
+            targetFunc();
+            timeout = null;
+        }, duration);
+    }
+};
 
 /**
  * Once scheduled, it's fixed, can not reschedule until it's done
@@ -1355,13 +1369,14 @@ Watchers.watcher = function(onChange) {
 };
 
 try {
-    module.exports = {
-        ObjectUtil: ObjectUtil,
-        Cols: Cols,
-        StringUtil: StringUtil,
-        RandomUtil: RandomUtil
-    };
+    //module.exports = {
+    //    ObjectUtil: ObjectUtil,
+    //    Cols: Cols,
+    //    StringUtil: StringUtil,
+    //    RandomUtil: RandomUtil
+    //};
     global.Fs = Fs;
+    global.Async = Async;
     global.Cols = Cols;
     global.ObjectUtil = ObjectUtil;
     global.StringUtil = StringUtil;

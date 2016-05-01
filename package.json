@@ -4,9 +4,11 @@
   "description": "Node server for C sharp",
   "main": "index.js",
   "author": "Quan Le",
-  "dependencies": {},
-  "devDependencies": {
+  "dependencies": {
+    "chokidar": "^1.4.3",
     "express": "^4.13.3",
     "q": "^1.4.1"
+  },
+  "devDependencies": {
   }
 }

@@ -13,15 +13,20 @@ module.exports = function(serverOptions) {
             var app = express();
 
 
-
-            app.get("/", require("./src/cs-html/layout")({
+            var hotReload = require("./src/hot-reload")();
+            var layoutExpress = require("./src/cs-html/layout")({
                 bundle: require("./src/cs-html/bundle")(),
                 replaces: {
-                    "@MvcApplication.WebsiteHost": "pct.prototype1.io"
-                }
-            }));
-            app.use(express.static(serverOptions.baseDir));
+                    "@MvcApplication.WebsiteHost": serverOptions.apiHost
+                },
+                modifier: hotReload.htmlModifier
+            });
 
+            app.get("/", layoutExpress);
+            app.use(express.static(serverOptions.baseDir));
+            app.use(hotReload.express);
+
+            hotReload.watch("app");
 
             var server = app.listen(serverOptions.port, function () {
             });
