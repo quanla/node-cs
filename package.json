@@ -1,0 +1,12 @@
+{
+  "name": "node-cs",
+  "version": "1.0.0",
+  "description": "Node server for C sharp",
+  "main": "index.js",
+  "author": "Quan Le",
+  "dependencies": {},
+  "devDependencies": {
+    "express": "^4.13.3",
+    "q": "^1.4.1"
+  }
+}
