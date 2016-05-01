@@ -15,7 +15,10 @@ module.exports = function(serverOptions) {
 
 
             app.get("/", require("./src/cs-html/layout")({
-                bundle: require("./src/cs-html/bundle")()
+                bundle: require("./src/cs-html/bundle")(),
+                replaces: {
+                    "@MvcApplication.WebsiteHost": "pct.prototype1.io"
+                }
             }));
             app.use(express.static(serverOptions.baseDir));
 

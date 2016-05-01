@@ -1,27 +1,35 @@
 module.exports = function(path) {
     path = path || "./App_Start/BundleConfig.cs";
 
-    var fs = require("fs");
-    var content = fs.readFileSync(path, "utf8");
 
+    var $q = require("q");
+    return function() {
 
-    //console.log(content);
+        var defer = $q.defer();
+        require("fs").readFile(path, "utf8", function(err, content) {
 
-    var bundles = {};
-    var type = "";
+            //console.log(content);
 
-    RegexUtil.each("var (.+?) = new (?:StyleBundle|ScriptBundle)\\(\"(.+?)\"\\);", content, function(match) {
-        var bundleVarName = match[1];
-        var bundleName = match[2];
+            var bundles = {};
 
-        var dec = new RegExp(bundleVarName + "\\.Include\\(([^)]+?)\\);").exec(content)[1];
+            RegexUtil.each("var (.+?) = new (?:StyleBundle|ScriptBundle)\\(\"(.+?)\"\\);", content, function(match) {
+                var bundleVarName = match[1];
+                var bundleName = match[2];
 
-        var list = [];
-        RegexUtil.each(new RegExp("^\\s+\"(.+?)\"", "mg"), dec, function(m3) {
-            list.push(m3[1].replace(/^~\//, ""));
+                var dec = new RegExp(bundleVarName + "\\.Include\\(([^)]+?)\\);").exec(content)[1];
+
+                var list = [];
+                RegexUtil.each(new RegExp("^\\s+\"(.+?)\"", "mg"), dec, function(m3) {
+                    list.push(m3[1].replace(/^~\//, ""));
+                });
+                bundles[bundleName] = list;
+            });
+
+            defer.resolve(bundles);
         });
-        bundles[bundleName] = list;
-    });
 
-    return bundles;
+
+
+        return defer.promise;
+    };
 };

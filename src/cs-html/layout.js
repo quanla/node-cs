@@ -13,29 +13,43 @@ function replaceBundles(content, bundle) {
 function removeComments(content) {
     return content.replace(new RegExp("@\\*(?:.|\r?\n)+?\\*@", "g"), "");
 }
+function simpleReplaces(content, vars) {
+    Cols.eachEntry(vars, function(key, val) {
+        content = content.replace(key, val);
+    });
+    return content;
+}
 
+var $q = require("q");
+function readFile(path) {
+    var defer = $q.defer();
+
+    var fs = require("fs");
+    fs.readFile(path, 'utf8', function (err, content) {
+        defer.resolve(content);
+    });
+    return defer.promise;
+}
 
 module.exports = function(options) {
 
-    var $q = require("q");
 
     function serve() {
         var defer = $q.defer();
 
-        var fs = require("fs");
-        fs.readFile("./Views/Shared/_Layout.cshtml", 'utf8', function (err,content) {
-            if (err) {
-                return console.log(err);
-            }
+        $q.all([readFile("./Views/Shared/_Layout.cshtml"), options.bundle()]).then(function(rets) {
+            var htmlContent = rets[0];
+            var bundles = rets[1];
 
-            content = removeComments(content);
+            var content = removeComments(htmlContent);
             content = content.replace("@RenderBody()", "");
-            content = replaceBundles(content, options.bundle);
+            content = replaceBundles(content, bundles);
+            content = simpleReplaces(content, options.replaces);
 
             defer.resolve(content);
 
-
         });
+
         return defer.promise;
     }
 
