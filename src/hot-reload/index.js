@@ -22,7 +22,7 @@ module.exports = function() {
                     client.send(msgStr);
                 });
             };
-            console.log("Websocket ready");
+            //console.log("Websocket ready");
         },
         watch: function(path) {
             var reloadPage = Async.rapidCallAbsorber(function() {

@@ -29,6 +29,7 @@ module.exports = function(serverOptions) {
             hotReload.watch("app");
 
             var server = app.listen(serverOptions.port, function () {
+                console.log("Server running on " + serverOptions.port);
             });
         }
     };
