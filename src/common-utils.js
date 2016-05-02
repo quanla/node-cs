@@ -1111,12 +1111,12 @@ Async.rapidCallAbsorber = function(targetFunc, duration) {
     duration = duration || 100;
 
     var timeout;
-    return function(task) {
+    return function(p1, p2) {
         if (timeout) {
             return;
         }
         timeout = setTimeout(function() {
-            targetFunc();
+            targetFunc(p1, p2);
             timeout = null;
         }, duration);
     }

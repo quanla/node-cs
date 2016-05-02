@@ -26,11 +26,8 @@ module.exports = function() {
         },
         watch: function(path) {
             var reloadPage = Async.rapidCallAbsorber(function() {
+                console.log("reloadPage");
                 sendAllClients({action: "reloadPage"});
-            });
-
-            var reloadCss = Async.rapidCallAbsorber(function() {
-                sendAllClients({action: "reloadCss"});
             });
 
 
@@ -38,11 +35,28 @@ module.exports = function() {
 
             chokidar
                 .watch(path, {
-                    //ignored: /[\/\\]\./,
+                    ignored: /[\/\\]\.|\.css|\.scss/,
                     ignoreInitial: true
                 })
                 .on('all', function(event, path) {
                     reloadPage();
+                })
+            ;
+        },
+        watchCss: function(path) {
+            var reloadCss = Async.rapidCallAbsorber(function(path) {
+                sendAllClients({action: "reloadCss", path: path});
+            });
+
+            var chokidar = require("chokidar");
+
+            chokidar
+                .watch(path, {
+                    ignored: /\.(?!css)[^.]+$/,
+                    ignoreInitial: true
+                })
+                .on('all', function(event, path) {
+                    reloadCss(path);
                 })
             ;
         }
