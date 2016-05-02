@@ -2,10 +2,10 @@ module.exports = function() {
 
     var sendAllClients;
 
+    var embededJs = require("fs").readFileSync(__dirname + "/embed.js", "utf8");
+
     return {
         htmlModifier: function(html) {
-            var fs = require("fs");
-            var embededJs = fs.readFileSync(__dirname + "/embed.js", "utf8");
             html = html.replace("</body>", "<script>" + embededJs + "</script>");
             return html;
         },
@@ -26,7 +26,7 @@ module.exports = function() {
         },
         watch: function(path) {
             var reloadPage = Async.rapidCallAbsorber(function() {
-                console.log("reloadPage");
+                //console.log("reloadPage");
                 sendAllClients({action: "reloadPage"});
             });
 

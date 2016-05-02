@@ -418,6 +418,10 @@ RegexUtil.replaceAll = function(str, exp, replace) {
     }
 };
 
+RegexUtil.escape = function(str) {
+    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+};
+
 var Fs = Fs || {};
 Fs.p0 = function(p1, a) {
     return function() {
