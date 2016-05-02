@@ -24,7 +24,7 @@ module.exports = function() {
             };
             //console.log("Websocket ready");
         },
-        watch: function(path) {
+        watch: function() {
             var reloadPage = Async.rapidCallAbsorber(function() {
                 //console.log("reloadPage");
                 sendAllClients({action: "reloadPage"});
@@ -34,10 +34,12 @@ module.exports = function() {
             var chokidar = require("chokidar");
 
             chokidar
-                .watch(path, {
+                .watch("app", {
                     ignored: /[\/\\]\.|\.css|\.scss/,
                     ignoreInitial: true
                 })
+                .add("./App_Start/BundleConfig.cs")
+                .add("./Views/Shared/_Layout.cshtml")
                 .on('all', function(event, path) {
                     reloadPage();
                 })

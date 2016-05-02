@@ -23,7 +23,7 @@ module.exports = function(serverOptions) {
             app.use(express.static(serverOptions.baseDir));
             hotReload.express(app);
 
-            hotReload.watch("app");
+            hotReload.watch();
             hotReload.watchCss("app/css/style.css");
 
             var server = app.listen(serverOptions.port, function () {

@@ -31,6 +31,19 @@ module.exports = function(serverOptions) {
         return content.substring(0, start) + indent + Cols.join(lines, "," + lineFeed + indent) + lineFeed + indent + content.substring(end);
     }
 
+
+    var ngAnnotate = require("ng-annotate");
+    function annotateNg(path) {
+        var fs = require("fs");
+        fs.readFile("./" + path, "utf8", function(err, content) {
+            var annotatedContent = ngAnnotate(content, { map: false, remove: true, add: true }).src;
+            if (StringUtil.isNotEmpty(annotatedContent) && annotatedContent != content) {
+                console.log("Annotated " + path);
+                fs.writeFile("./" + path, annotatedContent);
+            }
+        });
+    }
+
     return {
         start: function() {
 
@@ -45,6 +58,9 @@ module.exports = function(serverOptions) {
                 })
                 .on('unlink', function(event, path) {
                     injectJs();
+                })
+                .on('change', function(path, stats) {
+                    annotateNg(path);
                 })
             ;
             injectJs();

@@ -49,7 +49,7 @@ module.exports = function(serverOptions) {
                     ignoreInitial: true
                 })
                 .on('change', function(event, path) {
-                    console.log("Compiling scss");
+                    //console.log("Compiling scss");
                     compileScss();
                 })
             ;
