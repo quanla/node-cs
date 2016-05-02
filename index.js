@@ -24,7 +24,7 @@ module.exports = function(serverOptions) {
 
             app.get("/", layoutExpress);
             app.use(express.static(serverOptions.baseDir));
-            app.use(hotReload.express);
+            hotReload.express(app);
 
             hotReload.watch("app");
 

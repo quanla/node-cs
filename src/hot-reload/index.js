@@ -1,19 +1,36 @@
 module.exports = function() {
 
-
+    var sendAllClients;
 
     return {
         htmlModifier: function(html) {
-            //console.log(html);
+            var fs = require("fs");
+            var embededJs = fs.readFileSync(__dirname + "/embed.js", "utf8");
+            html = html.replace("</body>", "<script>" + embededJs + "</script>");
             return html;
         },
-        express: function(req, res, next) {
-            console.log(123123);
-            next();
+        express: function(app) {
+            var expressWs = require('express-ws')(app);
+
+            app.ws('/hot-reload', function(ws, req) {
+            });
+            var aWss = expressWs.getWss('/hot-reload');
+
+            sendAllClients = function(msg) {
+                var msgStr = JSON.stringify(msg);
+                aWss.clients.forEach(function (client) {
+                    client.send(msgStr);
+                });
+            };
+            console.log("Websocket ready");
         },
         watch: function(path) {
-            var reload = Async.rapidCallAbsorber(function() {
-                console.log("Reloading @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+            var reloadPage = Async.rapidCallAbsorber(function() {
+                sendAllClients({action: "reloadPage"});
+            });
+
+            var reloadCss = Async.rapidCallAbsorber(function() {
+                sendAllClients({action: "reloadCss"});
             });
 
 
@@ -25,8 +42,7 @@ module.exports = function() {
                     ignoreInitial: true
                 })
                 .on('all', function(event, path) {
-                    //console.log(event, path);
-                    reload();
+                    reloadPage();
                 })
             ;
         }

@@ -7,8 +7,8 @@
   "dependencies": {
     "chokidar": "^1.4.3",
     "express": "^4.13.3",
+    "express-ws": "^2.0.0-rc.1",
     "q": "^1.4.1"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }
