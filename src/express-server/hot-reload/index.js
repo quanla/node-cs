@@ -19,7 +19,11 @@ module.exports = function() {
             sendAllClients = function(msg) {
                 var msgStr = JSON.stringify(msg);
                 aWss.clients.forEach(function (client) {
-                    client.send(msgStr);
+                    try {
+                        client.send(msgStr);
+                    } catch (e) {
+                        console.error(e);
+                    }
                 });
             };
             //console.log("Websocket ready");
