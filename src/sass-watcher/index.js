@@ -15,6 +15,7 @@ module.exports = function(serverOptions) {
         var glob = require("glob");
         glob("./app/spa/**/*.scss", null, function (er, files) {
             var fs = require("fs");
+            files.sort();
             fs.readFile("./app/scss/style.scss", "utf8", function(err, content) {
                 content = replaceLinesBetween("// Inject start", "// Inject end", content, Cols.yield(files, function(file) {
                     return "@import \"" + file.replace(/^.\/app/, "..") + "\";";
@@ -54,7 +55,7 @@ module.exports = function(serverOptions) {
             ;
 
             chokidar
-                .watch("./app/spa/**.scss", {
+                .watch("./app/spa/**/*.scss", {
                     ignoreInitial: true
                 })
                 .on('add', function(event, path) {
