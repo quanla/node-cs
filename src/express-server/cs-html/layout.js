@@ -39,7 +39,7 @@ module.exports = function(options) {
     function serve() {
         var defer = $q.defer();
 
-        $q.all([readFile("./Views/Shared/_Layout.cshtml"), options.bundle()]).then(function(rets) {
+        $q.all([readFile(options.file), options.bundle()]).then(function(rets) {
             var htmlContent = rets[0];
             var bundles = rets[1];
 
