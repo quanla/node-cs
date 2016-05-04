@@ -2,10 +2,12 @@ module.exports = function(serverOptions) {
 
     var compileScss = Async.rapidCallAbsorber(function() {
         var sass = require('node-sass');
+        var start = new Date().getTime();
         sass.render({file: "./app/scss/style.scss"}, function(error, result) {
             if(!error){
                 var fs = require("fs");
                 fs.writeFile("./app/css/style.css", result.css);
+                console.log("Duration: " + (new Date().getTime() - start));
             } else {
                 console.error(error);
             }
