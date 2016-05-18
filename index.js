@@ -11,6 +11,13 @@ module.exports = function(serverOptions) {
         }];
     }
 
+    if (serverOptions.injectJs == null) {
+        serverOptions.injectJs = [{
+            bundleFile: "App_Start/BundleConfig.cs",
+            dir: "app/spa"
+        }];
+    }
+
     return {
         start: function() {
             require("./src/express-server")(serverOptions).start();

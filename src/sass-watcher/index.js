@@ -17,6 +17,7 @@ module.exports = function(serverOptions) {
             });
         };
     }
+
     function scssPointInjector(compileScssPoint) {
         var glob = require("glob");
 
@@ -59,11 +60,14 @@ module.exports = function(serverOptions) {
 
                 var compileScss = Async.rapidCallAbsorber(scssPointCompiler(compileScssPoint));
 
-
+                var watchPaths = compileScssPoint.watches.map(function(w) { return "./" + w + "/**/*.*"; });
                 chokidar
-                    .watch(["./" + path.dirname(compileScssPoint.from) + "/**/*.*", "./" + compileScssPoint.appScss + "/**/*.scss"], {
-                        ignoreInitial: true
-                    })
+                    .watch(
+                        watchPaths.concat(["./" + compileScssPoint.appScss + "/**/*.scss"])
+                        , {
+                            ignoreInitial: true
+                        }
+                    )
                     .on('change', function(event, path) {
                         //console.log("Compiling scss");
                         compileScss();

@@ -1,21 +1,26 @@
 module.exports = function(serverOptions) {
 
-    var injectJs = Async.rapidCallAbsorber(function() {
+
+    function jsInjector(injectJsPoint) {
         var glob = require("glob");
-        var intoFile = "./App_Start/BundleConfig.cs";
+        return function() {
+            var intoFile = "./" + injectJsPoint.bundleFile;
 
-        glob("./app/spa/**/*.js", null, function (er, files) {
-            var fs = require("fs");
-            files.sort();
-            fs.readFile(intoFile, "utf8", function(err, content) {
-                content = replaceLinesBetween("// Inject start", "// Inject end", content, Cols.yield(files, function(file) {
-                    return "\"" + file.replace(/^.\//, "~/") + "\"";
-                }));
-                fs.writeFile(intoFile, content);
+            glob("./" + injectJsPoint.dir + "/**/*.js", null, function (er, files) {
+                var fs = require("fs");
+                files.sort();
+                fs.readFile(intoFile, "utf8", function(err, content) {
+                    var newContent = replaceLinesBetween("// Inject" + (injectJsPoint.injectName ? " " + injectJsPoint.injectName : "") + " start", "// Inject" + (injectJsPoint.injectName ? " " + injectJsPoint.injectName : "") + " end", content, Cols.yield(files, function(file) {
+                        return "\"" + file.replace(/^.\//, "~/") + "\"";
+                    }));
+                    if (newContent != content) {
+                        fs.writeFile(intoFile, newContent);
+                    }
+                });
+
             });
-
-        });
-    });
+        };
+    }
 
     function replaceLinesBetween(lineStart, lineEnd, content, lines) {
 
@@ -33,7 +38,7 @@ module.exports = function(serverOptions) {
 
 
     var ngAnnotate = require("ng-annotate");
-    function annotateNg(path) {
+    function annotateJsFile(path) {
         var fs = require("fs");
         fs.readFile("./" + path, "utf8", function(err, content) {
             var annotatedContent = ngAnnotate(content, { map: false, remove: true, add: true }).src;
@@ -49,21 +54,25 @@ module.exports = function(serverOptions) {
 
             var chokidar = require("chokidar");
 
-            chokidar
-                .watch("./app/spa/**/*.js", {
-                    ignoreInitial: true
-                })
-                .on('add', function(event, path) {
-                    injectJs();
-                })
-                .on('unlink', function(event, path) {
-                    injectJs();
-                })
-                .on('change', function(path, stats) {
-                    annotateNg(path);
-                })
-            ;
-            injectJs();
+            serverOptions.injectJs.forEach(function(injectJsPoint, index) {
+                var injectJs = Async.rapidCallAbsorber(jsInjector(injectJsPoint));
+
+                chokidar
+                    .watch("./" + injectJsPoint.dir + "/**/*.js", {
+                        ignoreInitial: true
+                    })
+                    .on('add', function(event, path) {
+                        injectJs();
+                    })
+                    .on('unlink', function(event, path) {
+                        injectJs();
+                    })
+                    .on('change', function(path, stats) {
+                        annotateJsFile(path);
+                    })
+                ;
+                setTimeout(injectJs, index * 200);
+            });
         }
     };
 };
