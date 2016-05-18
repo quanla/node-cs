@@ -1,32 +1,41 @@
+var path = require("path");
+
 module.exports = function(serverOptions) {
 
-    var compileScss = Async.rapidCallAbsorber(function() {
+    function scssPointCompiler(compileScssPoint) {
         var sass = require('node-sass');
-        //var start = new Date().getTime();
-        sass.render({file: "./app/scss/style.scss"}, function(error, result) {
-            if(!error){
-                var fs = require("fs");
-                fs.writeFile("./app/css/style.css", result.css);
-                //console.log("Duration: " + (new Date().getTime() - start));
-            } else {
-                console.error(error);
-            }
-        });
-    });
-    var injectScss = Async.rapidCallAbsorber(function() {
-        var glob = require("glob");
-        glob("./app/spa/**/*.scss", null, function (er, files) {
-            var fs = require("fs");
-            files.sort();
-            fs.readFile("./app/scss/style.scss", "utf8", function(err, content) {
-                content = replaceLinesBetween("// Inject start", "// Inject end", content, Cols.yield(files, function(file) {
-                    return "@import \"" + file.replace(/^.\/app/, "..") + "\";";
-                }));
-                fs.writeFile("./app/scss/style.scss", content);
-            });
 
-        });
-    });
+        return function() {
+            sass.render({file: "./" + compileScssPoint.from}, function(error, result) {
+                if(!error){
+                    var fs = require("fs");
+                    fs.writeFile("./" + compileScssPoint.to, result.css);
+                    //console.log("Duration: " + (new Date().getTime() - start));
+                } else {
+                    console.error(error);
+                }
+            });
+        };
+    }
+    function scssPointInjector(compileScssPoint) {
+        var glob = require("glob");
+
+        return function() {
+            glob("./" + compileScssPoint.appScss + "/**/*.scss", null, function (er, files) {
+                var fs = require("fs");
+                files.sort();
+
+                fs.readFile("./" + compileScssPoint.from, "utf8", function(err, content) {
+                    content = replaceLinesBetween("// Inject start", "// Inject end", content, Cols.yield(files, function(file) {
+                        var relativePath = path.relative("/" + path.dirname(compileScssPoint.from), path.dirname(file.replace(/^\./,""))).replace(/\\/g, "/");
+                        return "@import \"" + relativePath + "/" + path.basename(file) + "\";";
+                    }));
+                    fs.writeFile("./" + compileScssPoint.from, content);
+                });
+
+            });
+        };
+    }
 
     function replaceLinesBetween(lineStart, lineEnd, content, lines) {
 
@@ -46,27 +55,37 @@ module.exports = function(serverOptions) {
 
             var chokidar = require("chokidar");
 
-            chokidar
-                .watch(["./app/scss/**/*.*", "./app/spa/**/*.scss"], {
-                    ignoreInitial: true
-                })
-                .on('change', function(event, path) {
-                    //console.log("Compiling scss");
-                    compileScss();
-                })
-            ;
+            serverOptions.compileScss.forEach(function(compileScssPoint) {
 
-            chokidar
-                .watch("./app/spa/**/*.scss", {
-                    ignoreInitial: true
-                })
-                .on('add', function(event, path) {
-                    injectScss();
-                })
-                .on('unlink', function(event, path) {
-                    injectScss();
-                })
-            ;
+                var compileScss = Async.rapidCallAbsorber(scssPointCompiler(compileScssPoint));
+
+
+                chokidar
+                    .watch(["./" + path.dirname(compileScssPoint.from) + "/**/*.*", "./" + compileScssPoint.appScss + "/**/*.scss"], {
+                        ignoreInitial: true
+                    })
+                    .on('change', function(event, path) {
+                        //console.log("Compiling scss");
+                        compileScss();
+                    })
+                ;
+            });
+
+            serverOptions.compileScss.forEach(function(compileScssPoint) {
+                var injectScss = Async.rapidCallAbsorber(scssPointInjector(compileScssPoint));
+
+                chokidar
+                    .watch("./" + compileScssPoint.appScss + "/**/*.scss", {
+                        ignoreInitial: true
+                    })
+                    .on('add', function(event, path) {
+                        injectScss();
+                    })
+                    .on('unlink', function(event, path) {
+                        injectScss();
+                    })
+                ;
+            });
         }
     };
 };

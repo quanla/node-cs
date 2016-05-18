@@ -1,7 +1,15 @@
+require("./src/common-utils");
 
 module.exports = function(serverOptions) {
 
-    require("./src/common-utils");
+    if (serverOptions.compileScss == null) {
+        serverOptions.compileScss = [{
+            from: "app/scss/style.scss",
+            to: "app/css/style.css",
+            watches: ["app/scss"],
+            appScss: "app/spa"
+        }];
+    }
 
     return {
         start: function() {
