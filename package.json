@@ -5,13 +5,10 @@
   "main": "index.js",
   "author": "Quan Le",
   "dependencies": {
-    "chokidar": "^1.4.3",
-    "express": "^4.13.3",
-    "express-ws": "^2.0.0-rc.1",
+    "chokidar": "^1.5.1",
+    "express": "^4.13.4",
     "glob": "^7.0.3",
-    "ng-annotate": "^1.2.1",
-    "node-sass": "^3.6.0",
-    "q": "^1.4.1"
+    "node-common": "^1.6.1"
   },
   "devDependencies": {}
 }
