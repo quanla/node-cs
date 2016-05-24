@@ -22,6 +22,13 @@ function simpleReplaces(content, vars) {
     return content;
 }
 
+function replacesAspxCode(content) {
+    return content
+            .replace(/@using .+?\r?\n/g, "")
+            .replace(new RegExp("@\\{(?:.|\r?\n)+?\\}", "g"), "")
+        ;
+}
+
 var $q = require("q");
 function readFile(path) {
     var defer = $q.defer();
@@ -47,6 +54,7 @@ module.exports = function(options) {
             content = content.replace("@RenderBody()", "");
             content = replaceBundles(content, bundles);
             content = simpleReplaces(content, options.replaces);
+            content = replacesAspxCode(content);
 
             if (options.modifier) {
                 content = options.modifier(content);
