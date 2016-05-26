@@ -16,9 +16,11 @@ module.exports = function(serverOptions) {
             var replaces = {
                 "@MvcApplication.WebsiteHost": serverOptions.apiHost
             };
-            startPoint.replaces.forEach(function(r) {
-                replaces[r.from] = r.to;
-            });
+            if (startPoint.replaces) {
+                startPoint.replaces.forEach(function(r) {
+                    replaces[r.from] = r.to;
+                });
+            }
 
             var layoutExpress = require("./cs-html/layout")({
                 file: "./" + startPoint.file,
