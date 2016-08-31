@@ -1,11 +1,11 @@
 function replaceBundles(content, bundle) {
 
     content = RegexUtil.replaceAll(content, "@Styles\\.Render\\(\"(.+?)\"\\)", function(m) {
-        return Cols.join(Cols.yield(bundle[m[1]], function(r) { return  "<link rel=\"stylesheet\" href=\"" + r.replace(/^~/, "") + "\"/>"; }), "\n");
+        return Cols.join(Cols.yield(bundle[m[1]], function(r) { return  "<link rel=\"stylesheet\" href=\"/" + r.replace(/^~\/?/, "") + "\"/>"; }), "\n");
     });
 
     content = RegexUtil.replaceAll(content, "@Scripts\\.Render\\(\"(.+?)\"\\)", function(m) {
-        return Cols.join(Cols.yield(bundle[m[1]], function(r) { return  "<script type=\"text/javascript\" src=\"" + r.replace(/^~/, "") + "\"></script>"; }), "\n");
+        return Cols.join(Cols.yield(bundle[m[1]], function(r) { return  "<script type=\"text/javascript\" src=\"/" + r.replace(/^~\/?/, "") + "\"></script>"; }), "\n");
     });
 
     return content;
