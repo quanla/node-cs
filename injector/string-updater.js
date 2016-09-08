@@ -12,7 +12,7 @@ function StringUpdater(string) {
     };
 
     this.applyChanges = function() {
-        changes.sort(Cols.sortBy("start"));
+        changes.sort(Cols.sortBy(function(change) { return -change.start;}));
         var newString = string;
         for (var i = 0; i < changes.length; i++) {
             var change = changes[i];
