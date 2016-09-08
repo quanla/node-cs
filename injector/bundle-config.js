@@ -18,17 +18,26 @@ require("./node-cs/injector/bundle-config")({
 */
 
 function replaceLinesBetween(lineStart, lineEnd, content, lines) {
+    var stringUpdater = new (require("./string-updater").StringUpdater)(content);
 
-    var match = new RegExp("([ \\t]*)" + RegexUtil.escape(lineStart) + "(\r?\n)").exec(content);
-    var start = match.index + match[0].length;
+    var regExpStart = new RegExp("([ \\t]*)" + RegexUtil.escape(lineStart) + "(\r?\n)", "g");
+    var regExpEnd = new RegExp(RegexUtil.escape(lineEnd) + "\r?\n", "g");
+    for (var match ; match = regExpStart.exec(content); ) {
+        var start = match.index + match[0].length;
 
-    var indent = match[1];
-    var lineFeed = match[2];
+        var indent = match[1];
+        var lineFeed = match[2];
 
-    var m1 = new RegExp(RegexUtil.escape(lineEnd) + "\r?\n").exec(content);
-    var end = m1.index;
+        var m1 = regExpEnd.exec(content);
+        var replaceEnd = m1.index;
 
-    return content.substring(0, start) + indent + Cols.join(lines, "," + lineFeed + indent) + lineFeed + indent + content.substring(end);
+        var afterLineEndEnd = replaceEnd + lineEnd.length;
+        var needEndComma = /\S/.test(content.substring(afterLineEndEnd, content.indexOf(")", afterLineEndEnd)));
+
+        stringUpdater.addReplace(start, replaceEnd, indent + Cols.join(lines, "," + lineFeed + indent) + (needEndComma ? ",":"") + lineFeed + indent);
+    }
+
+    return stringUpdater.applyChanges();
 }
 
 
