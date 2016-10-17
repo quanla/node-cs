@@ -24,7 +24,6 @@ module.exports = function(path) {
                 });
                 bundles[bundleName] = list;
             });
-
             defer.resolve(bundles);
         });
 

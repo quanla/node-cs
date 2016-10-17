@@ -59,7 +59,6 @@ module.exports = function(options) {
             if (options.modifier) {
                 content = options.modifier(content);
             }
-
             defer.resolve(content);
 
         });
