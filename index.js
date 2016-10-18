@@ -19,8 +19,8 @@ module.exports = function(serverOptions) {
     //}
 
     return {
-        start: function() {
-            return require("./src/express-server")(serverOptions).start();
+        start: function(prepareApp) {
+            return require("./src/express-server")(serverOptions).start(prepareApp);
 
 
 

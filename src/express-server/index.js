@@ -34,7 +34,7 @@ module.exports = function(serverOptions) {
     }
 
     return {
-        start: function() {
+        start: function(prepareApp) {
             var express = require("express");
 
             var app = express();
@@ -43,6 +43,10 @@ module.exports = function(serverOptions) {
 
             app.use(express.static(serverOptions.baseDir));
             hotReload.express(app);
+            
+            if (prepareApp) {
+                prepareApp(app);
+            }
 
             var server = app.listen(serverOptions.port, function () {
                 console.log("Server running on " + serverOptions.port);
