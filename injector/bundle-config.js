@@ -9,7 +9,7 @@ require("./node-cs/injector/bundle-config")({
             injectName: "front-end"
         },
         {
-            dir: "Areas/Management/app/angular",
+            dir: "app/backend/angular",
             injectName: "back-end"
         }
     ]
